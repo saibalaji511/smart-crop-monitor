@@ -67,7 +67,10 @@ export default function App() {
                 <main className="main-content">
                     <Routes>
                         {/* Pass the userName down to the Dashboard as a prop */}
-                        <Route path="/" element={<Dashboard userName={user.name} userId={user.id} />} />
+                        <Route
+                            path="/"
+                            element={<Dashboard userName={user.name} userId={user.id} />}
+                        />
                         <Route path="/diagnosis" element={<Diagnosis />} />
                         <Route path="/expert" element={<ExpertConnect />} />
                         <Route path="/logs" element={<TreatmentLogs />} />

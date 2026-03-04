@@ -18,27 +18,34 @@ export default function Login({ onLogin }) {
         try {
             if (isSignUp) {
                 // 1. Sign Up New User
-                const { data, error } = await supabase.auth.signUp({
+                const { data, error: signUpError } = await supabase.auth.signUp({
                     email,
                     password,
                 });
-                if (error) throw error;
+                if (signUpError) throw signUpError;
 
-                // 2. Create Profile Entry
+                // 2. Insert Profile Data
                 if (data.user) {
-                    await supabase.from('profiles').insert([{ id: data.user.id, full_name: name, email }]);
-                    alert('Sign up successful! You can now log in.');
-                    setIsSignUp(false); // Switch to login mode
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .insert([{ id: data.user.id, full_name: name, email }]);
+                    if (profileError) throw profileError;
+
+                    // AUTO-LOGIN after Sign Up
+                    onLogin({
+                        name: name,
+                        email: email,
+                        id: data.user.id
+                    });
                 }
             } else {
-                // 1. Log In Existing User
-                const { data, error } = await supabase.auth.signInWithPassword({
+                // EXISTING LOGIN LOGIC
+                const { data, error: signInError } = await supabase.auth.signInWithPassword({
                     email,
                     password,
                 });
-                if (error) throw error;
+                if (signInError) throw signInError;
 
-                // 2. Fetch User Profile Name
                 const { data: profile } = await supabase
                     .from('profiles')
                     .select('full_name')
